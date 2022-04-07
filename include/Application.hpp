@@ -30,9 +30,9 @@ namespace vladistas
 	private:
 		struct Message
 		{
-			Message(int32_t _userID, int _reportLevel)
+			Message(long _userID, int _reportLevel)
 				: userID(_userID), reportLevel(_reportLevel) { }
-			int32_t userID;
+			long userID;
 			int reportLevel;
 		};
 

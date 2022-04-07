@@ -25,7 +25,7 @@ namespace vladistas
 
 	void Config::init()
 	{
-		const auto filepath = std::string(".vladistascfg");
+		const auto filepath = std::string("vladistas.cfg");
 		auto ifs = std::ifstream(filepath);
 		if (!ifs.is_open())
 		{
@@ -46,18 +46,21 @@ namespace vladistas
 			size_t len;
 			auto action = Config::Action();
 
-			std::cout << it << std::endl;
 			len = find(it, ' ');
-			action.userID = std::stoi(it);
+			action.userID = std::stol(it);
 			it += len + 1;
 
-			std::cout << it << std::endl;
 			len = find(it, ' ');
 			action.reportLevel = std::stoi(it);
 			it += len + 1;
 
 			action.shortcut = toShortcut(it);
-			m_actions.push_back(std::move(action));
+			if (!action.shortcut.empty())
+			{
+				fprintf(stderr, "New action has been added. Report lv. %d" \
+					", user ID %ld\n", action.reportLevel, action.userID);
+				m_actions.push_back(std::move(action));
+			}
 		}
 	}
 
@@ -90,7 +93,13 @@ namespace vladistas
 				strncpy(buf, str, len);
 				buf[len] = '\0';
 
-				shortcut.emplace_back(toKey(buf));
+				const auto key = toKey(buf);
+				if (key == sf::Keyboard::Unknown)
+				{
+					fprintf(stderr, "\"%s\" syntax error\n", str);
+					return {};
+				}
+				shortcut.emplace_back(key);
 				str += len + 1;
 			}
 			if (*it == '\n' || *it == '\0')

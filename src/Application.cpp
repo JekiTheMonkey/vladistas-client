@@ -19,7 +19,7 @@ namespace vladistas
 	void Application::init()
 	{
 		m_config.init();
-		// Has to be retrieved from config instead
+
 		const auto serverIp = m_config.getIpAddress();
 		const auto ip = sf::IpAddress::getPublicAddress() != serverIp
 			? serverIp : sf::IpAddress::getLocalAddress();
@@ -57,15 +57,21 @@ namespace vladistas
 		while (!m_buffer.empty())
 		{
 			const auto msg = m_buffer.front();
-			res = snprintf(buf, sizeof(buf) - 1, "%d %d",
+			res = snprintf(buf, sizeof(buf) - 1, "%ld %d",
 				msg.userID, msg.reportLevel);
 			buf[res] = '\0';
 
+			fprintf(stderr, "Report sending [%s]\n", buf);
 			res = m_client->send(buf, static_cast<std::size_t>(res + 1));
 			if (!res)
 			{
-				fprintf(stderr, "Report to user with ID %d could not be " \
+				fprintf(stderr, "Report to user with ID %ld could not be " \
 					"sent to the server\n", msg.userID);
+			}
+			else
+			{
+				fprintf(stderr, "Report lv. %d to user %ld has been sent " \
+					"successfully\n", msg.reportLevel, msg.userID);
 			}
 			m_buffer.pop();
 		}
@@ -103,8 +109,8 @@ namespace vladistas
 		if (isPressed)
 		{
 			const auto &action = actions.at(static_cast<size_t>(pressedIndex));
-			fprintf(stderr, "Report lv. %d to user %d has been added to the " \
-				"buffer\n",	action.reportLevel, action.userID);
+			fprintf(stderr, "Report lv. %d to user %ld has been saved to " \
+				"send\n", action.reportLevel, action.userID);
 			m_buffer.emplace(action.userID, action.reportLevel);
 		}
 		wasPressed = isPressed;

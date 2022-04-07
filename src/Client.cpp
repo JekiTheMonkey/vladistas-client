@@ -18,7 +18,8 @@ namespace vladistas
 				"is probably offline" << std::endl;
 		else
 		if (status == sf::Socket::Disconnected)
-			std::cerr << "Socket has been disconnected" << std::endl;
+			std::cerr << "Socket has been disconnected, the server is " \
+				"probably offline" << std::endl;
 		else
 		if (status == sf::Socket::Error)
 			std::cerr << "An unexpected error happend while connecting to " \
