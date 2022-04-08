@@ -61,7 +61,7 @@ namespace vladistas
 				msg.userID, msg.reportLevel);
 			buf[res] = '\0';
 
-			fprintf(stderr, "Report sending [%s]\n", buf);
+			fprintf(stderr, "Sending message [%s]\n", buf);
 			res = m_client->send(buf, static_cast<std::size_t>(res + 1));
 			if (!res)
 			{

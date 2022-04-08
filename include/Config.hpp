@@ -17,7 +17,7 @@ namespace vladistas
 		struct Action
 		{
 			Shortcut shortcut;
-			long userID;
+			int64_t userID;
 			int reportLevel;
 		};
 
