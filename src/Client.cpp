@@ -5,7 +5,8 @@
 
 namespace vladistas
 {
-	bool Client::connect(const sf::IpAddress &ip, unsigned short port)
+	sf::Socket::Status Client::connect(const sf::IpAddress &ip,
+		unsigned short port)
 	{
 		const auto status = m_socket.connect(ip, port, sf::seconds(5.f));
 
@@ -28,7 +29,7 @@ namespace vladistas
 			std::cerr << "Something unexpected happend while connecting to " \
 				"the server, please report this fact" << std::endl;
 
-		return status == sf::Socket::Done;
+		return status;
 	}
 
 	void Client::disconnect()
@@ -36,7 +37,7 @@ namespace vladistas
 		m_socket.disconnect();
 	}
 
-	bool Client::send(const char *data, std::size_t size)
+	sf::Socket::Status Client::send(const char *data, std::size_t size)
 	{
 		const auto status = m_socket.send(data, size);
 
@@ -57,7 +58,7 @@ namespace vladistas
 			default: break;
 		}
 
-		return status == sf::Socket::Done;
+		return status;
 	}
 
 	Client::~Client()

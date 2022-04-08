@@ -1,7 +1,7 @@
 #include "Application.hpp"
 #include "Client.hpp"
 
-#include <SFML/System/Clock.hpp>
+#include <SFML/System.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
 #include <exception>
@@ -19,17 +19,7 @@ namespace vladistas
 	void Application::init()
 	{
 		m_config.init();
-
-		const auto serverIp = m_config.getIpAddress();
-		const auto ip = sf::IpAddress::getPublicAddress() != serverIp
-			? serverIp : sf::IpAddress::getLocalAddress();
-		const auto port = m_config.getPort();
-
-		const auto connected = m_client->connect(ip, port);
-		if (!connected)
-			throw std::runtime_error("Failed to connect to the server");
-		std::cerr << "Connection has been enstablished successfully"
-			<< std::endl;
+		connect();
 	}
 
 	void Application::run()
@@ -62,19 +52,68 @@ namespace vladistas
 				msg.userID, msg.reportLevel);
 			buf[res] = '\0';
 
-			fprintf(stderr, "Sending message [%s]\n", buf);
+			fprintf(stderr, "Sending message [%s]...\n", buf);
 			res = m_client->send(buf, static_cast<std::size_t>(res + 1));
-			if (!res)
-			{
-				fprintf(stderr, "Report to user with ID %lld could not be " \
-					"sent to the server\n", msg.userID);
-			}
-			else
+			if (res == sf::Socket::Done)
 			{
 				fprintf(stderr, "Report lv. %d to user %lld has been sent " \
 					"successfully\n", msg.reportLevel, msg.userID);
 			}
+			else
+			{
+				fprintf(stderr, "Report to user with ID %lld could not be " \
+					"sent to the server\n", msg.userID);
+				if (res == sf::Socket::Disconnected)
+				{
+					fprintf(stderr, "Connection with the server has been " \
+						" lost\n");
+					m_continue = false;
+				}
+			}
 			m_buffer.pop();
+		}
+	}
+
+	bool Application::connect()
+	{
+		const auto serverIp = m_config.getIpAddress();
+		const auto ip = sf::IpAddress::getPublicAddress() != serverIp
+			? serverIp : sf::IpAddress::getLocalAddress();
+		const auto port = m_config.getPort();
+		const auto connected = m_client->connect(ip, port);
+
+		if (connected == sf::Socket::Done)
+		{
+			fprintf(stderr, "Connection has been enstablished successfully\n");
+			return true;
+		}
+		else
+		{
+			fprintf(stderr, "Failed to connect to the server. " \
+				"Error code: %d\n", connected);
+			return false;
+		}
+	}
+
+	void Application::checkConnection()
+	{
+		const float timeouts[] =
+			{ 5.f,   15.f,  30.f,  60.f,
+			  120.f, 180.f, 240.f, 300.f };
+		auto i = 0u;
+		while (!m_continue)
+		{
+			fprintf(stderr, "Trying to reconnect to the server...\n");
+			const auto connected = connect();
+			if (!connected)
+			{
+				fprintf(stderr, "Failed to connect... Retrying in %f...",
+					timeouts[i]);
+				sf::sleep(sf::seconds(timeouts[i]));
+				i += i < sizeof(timeouts) - 1;
+			}
+			else
+				m_continue = true;
 		}
 	}
 
@@ -110,8 +149,6 @@ namespace vladistas
 		if (isPressed)
 		{
 			const auto &action = actions.at(static_cast<size_t>(pressedIndex));
-			fprintf(stderr, "Report lv. %d to user %lld has been saved to " \
-				"send\n", action.reportLevel, action.userID);
 			m_buffer.emplace(action.userID, action.reportLevel);
 		}
 		wasPressed = isPressed;

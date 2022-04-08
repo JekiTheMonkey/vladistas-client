@@ -27,6 +27,9 @@ namespace vladistas
 		void update();
 		void handleInput();
 
+		bool connect();
+		void checkConnection();
+
 	private:
 		struct Message
 		{

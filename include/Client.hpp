@@ -13,9 +13,10 @@ namespace vladistas
 		Client() = default;
 		~Client();
 
-		bool connect(const sf::IpAddress &ip, unsigned short port);
+		sf::Socket::Status connect(const sf::IpAddress &ip,
+			unsigned short port);
 		void disconnect();
-		bool send(const char *data, std::size_t size);
+		sf::Socket::Status send(const char *data, std::size_t size);
 
 	private:
 		sf::TcpSocket m_socket;
