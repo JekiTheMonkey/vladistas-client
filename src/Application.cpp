@@ -41,12 +41,13 @@ namespace vladistas
 		while (m_continue)
 		{
 			timeSinceLastUpdate += clock.restart();
-			if (timeSinceLastUpdate > timePerFrame)
+			while (timeSinceLastUpdate > timePerFrame)
 			{
 				timeSinceLastUpdate -= timePerFrame;
-				update();
 				handleInput();
+				update();
 			}
+			sf::sleep(timePerFrame - timeSinceLastUpdate);
 		}
 	}
 
