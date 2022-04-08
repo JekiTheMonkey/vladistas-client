@@ -47,7 +47,7 @@ namespace vladistas
 			auto action = Config::Action();
 
 			len = find(it, ' ');
-			action.userID = std::stol(it);
+			action.userID = std::stoll(it);
 			it += len + 1;
 
 			len = find(it, ' ');
@@ -58,7 +58,7 @@ namespace vladistas
 			if (!action.shortcut.empty())
 			{
 				fprintf(stderr, "New action has been added. Report lv. %d" \
-					", user ID %ld\n", action.reportLevel, action.userID);
+					", user ID %lld\n", action.reportLevel, action.userID);
 				m_actions.push_back(std::move(action));
 			}
 		}

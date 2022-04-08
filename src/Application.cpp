@@ -57,7 +57,7 @@ namespace vladistas
 		while (!m_buffer.empty())
 		{
 			const auto msg = m_buffer.front();
-			res = snprintf(buf, sizeof(buf) - 1, "%ld %d",
+			res = snprintf(buf, sizeof(buf) - 1, "%lld %d",
 				msg.userID, msg.reportLevel);
 			buf[res] = '\0';
 
@@ -65,12 +65,12 @@ namespace vladistas
 			res = m_client->send(buf, static_cast<std::size_t>(res + 1));
 			if (!res)
 			{
-				fprintf(stderr, "Report to user with ID %ld could not be " \
+				fprintf(stderr, "Report to user with ID %lld could not be " \
 					"sent to the server\n", msg.userID);
 			}
 			else
 			{
-				fprintf(stderr, "Report lv. %d to user %ld has been sent " \
+				fprintf(stderr, "Report lv. %d to user %lld has been sent " \
 					"successfully\n", msg.reportLevel, msg.userID);
 			}
 			m_buffer.pop();
@@ -109,7 +109,7 @@ namespace vladistas
 		if (isPressed)
 		{
 			const auto &action = actions.at(static_cast<size_t>(pressedIndex));
-			fprintf(stderr, "Report lv. %d to user %ld has been saved to " \
+			fprintf(stderr, "Report lv. %d to user %lld has been saved to " \
 				"send\n", action.reportLevel, action.userID);
 			m_buffer.emplace(action.userID, action.reportLevel);
 		}
