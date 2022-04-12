@@ -19,7 +19,9 @@ namespace vladistas
 	void Application::init()
 	{
 		m_config.init();
-		connect();
+		const auto connected = connect();
+		if (connected)
+			checkConnection();
 	}
 
 	void Application::run()
@@ -36,6 +38,7 @@ namespace vladistas
 				timeSinceLastUpdate -= timePerFrame;
 				handleInput();
 				update();
+				checkConnection();
 			}
 			sf::sleep(timePerFrame - timeSinceLastUpdate);
 		}
